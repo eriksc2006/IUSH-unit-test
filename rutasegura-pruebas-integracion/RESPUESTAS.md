@@ -1,7 +1,7 @@
 # Respuestas del taller — RutaSegura (Integración)
 
 Integrantes:
-- No informado
+- Erik Anthony Soto Castaño
 
 ## Ejercicio 1 — Orden de integración
 
