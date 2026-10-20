@@ -25,7 +25,33 @@ describe('Bottom-up - eta + notificador mediante driver', () => {
     );
   });
 
-  it.todo('driverNotificacion_conTraficoQueSubeElETAPorEncimaDe10_noDebeEnviarSMS');
-  it.todo('driverNotificacion_conBusDetenido_debePasarNullAlNotificadorYNoEnviarSMS');
-  it.todo('driverNotificacion_conUnTelefonoQueFalla_debeContarSoloLosExitosos');
+  it('driverNotificacion_conTraficoQueSubeElETAPorEncimaDe10_noDebeEnviarSMS', async () => {
+    const mensajeria = new MensajeriaStub();
+
+    const r = await driverNotificacion(mensajeria, PLACA, 40, 5, 1.5, ACUDIENTES);
+
+    expect(r.minutosEstimados).toBe(12);
+    expect(r.smsEnviados).toBe(0);
+    expect(mensajeria.enviados).toHaveLength(0);
+  });
+
+  it('driverNotificacion_conBusDetenido_debePasarNullAlNotificadorYNoEnviarSMS', async () => {
+    const mensajeria = new MensajeriaStub();
+
+    const r = await driverNotificacion(mensajeria, PLACA, 0, 5, 1.0, ACUDIENTES);
+
+    expect(r.minutosEstimados).toBeNull();
+    expect(r.smsEnviados).toBe(0);
+    expect(mensajeria.enviados).toHaveLength(0);
+  });
+
+  it('driverNotificacion_conUnTelefonoQueFalla_debeContarSoloLosExitosos', async () => {
+    const mensajeria = new MensajeriaStub().fallarPara('3001112233');
+
+    const r = await driverNotificacion(mensajeria, PLACA, 40, 5, 1.0, ACUDIENTES);
+
+    expect(r.minutosEstimados).toBe(8);
+    expect(r.smsEnviados).toBe(1);
+    expect(mensajeria.enviados.map((envio) => envio.telefono)).toEqual(['3007778899']);
+  });
 });
